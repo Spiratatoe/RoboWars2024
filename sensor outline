@@ -1,7 +1,7 @@
 /*
 Sensors:
-  ultrasound
-  IR
+  ultrasound 2
+  IR 2
   Light/colour sensors~4
 
   front 4 (2 IR)
@@ -12,6 +12,7 @@ Sensors:
 
 overlap sensors show target and help orient robot
 
+Electro magnets 2 controlled by 1 relay
 
 Motors:
 
