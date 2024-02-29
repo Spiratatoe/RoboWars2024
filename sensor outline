@@ -1,0 +1,18 @@
+/*
+Sensors:
+  ultrasound
+  IR
+  Light/colour sensors~2
+
+  front 4 (2 IR)
+    2 on corners
+  back 2 on corners
+
+  1 sensor on back for robot evasion
+
+overlap sensors show target and help orient robot
+
+
+Motors:
+
+*/
