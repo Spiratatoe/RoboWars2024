@@ -2,7 +2,7 @@
 Sensors:
   ultrasound
   IR
-  Light/colour sensors~2
+  Light/colour sensors~4
 
   front 4 (2 IR)
     2 on corners
