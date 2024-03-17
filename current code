@@ -1,0 +1,186 @@
+#include <Wire.h>
+#include <QTRSensors.h>
+#include <Arduino.h>
+
+//define constants 
+//aka pins
+
+//For motor driver
+int R_FmotorPin = 22;
+int R_BmotorPin = 23;
+int L_FmotorPin = 24;
+int L_BmotorPin = 25;
+
+//infrared sensors
+const int IR1pin = A0; //keep in an analog port since it didnt work in the other ones 
+const int IR2pin = A1; 
+
+//Ultrasonic sensors
+
+// defines pins numbers
+const int us_left_trigPin = 9;
+const int us_left_echoPin = 10;
+float usL_distance, usL_duration;
+const int us_right_trigPin = 9;
+const int us_right_echoPin = 10;
+float usR_distance, usR_duration;
+const int us_back_trigPin = 9;
+const int us_back_echoPin = 10;
+float usB_distance, usB_duration;
+
+//reflectance sensor (qtr) 2back 1 front
+QTRSensors qtrBL;
+QTRSensors qtrBR;
+QTRSensors qtrF;
+
+const uint8_t SensorCount = 1;
+uint16_t sensorValuesBL[SensorCount];
+uint16_t sensorValuesBR[SensorCount];
+uint16_t sensorValuesF[SensorCount];
+
+//For LIDAR TOF:  
+unsigned char ok_flag;
+unsigned char fail_flag;
+unsigned short lenth_val = 0;
+unsigned char i2c_rx_buf[16];
+unsigned char dirsend_flag=0;
+
+
+void setup() {
+  // put your setup code here, to run once:
+  wire.begin();
+  Serial.begin(9600);
+
+
+  //ultrasonic
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+
+  //infrared stuff
+  pinMode(IR1pin, INPUT); // IR Sensor pin INPUT
+  pinMode(IR2pin, INPUT); // IR Sensor pin INPUT
+
+  // //motor
+  pinMode(R_FmotorPin, OUTPUT);
+  pinMode(R_BmotorPin, OUTPUT);
+  pinMode(L_FmotorPin, OUTPUT);
+  pinMode(L_BmotorPin, OUTPUT);
+
+  //reflexive stuff
+  qtrBL.setTypeRC();
+  qtrBL.setSensorPins((const uint8_t[]){2, 3}, SensorCount);
+
+  qtrBR.setTypeRC();
+  qtrBR.setSensorPins((const uint8_t[]){4, 5}, SensorCount);
+
+  qtrF.setTypeRC();
+  qtrF.setSensorPins((const uint8_t[]){6, 7}, SensorCount);
+  //
+
+
+}
+
+void loop() {
+
+  //infrared
+  //this gets me a distance for which we can judge or next move 
+  qtrBL.read(SensorValuesBL);
+  qtrBR.read(SensorValuesBR);
+  qtrF.read(SensorValuesF);
+
+  float distanceRight = analogRead(IR1pin);
+  float distanceLeft = analogRead(IR2pin);  
+  Serial.println(distanceRight);  
+  Serial.println(distanceLeft);    
+
+
+
+  
+  //reflexive
+
+
+  
+
+}
+
+
+
+int LidarReadDistance() {
+  LidarSensorRead(0x00,i2c_rx_buf,2);
+  lenth_val=i2c_rx_buf[0];
+  lenth_val=lenth_val<<8;
+  lenth_val|=i2c_rx_buf[1];
+  delay(150);
+  return lenth_val;
+}
+
+void Forward()
+{
+  int speedR = 200;
+  int speedL = 200;
+  int back = 0;
+  analogWrite(R_FmotorPin, speedR);
+  analogWrite(R_BmotorPin, back);
+  Serial.print("Right Motor Forward");
+  Serial.println();
+  analogWrite(L_FmotorPin, speedL);
+  analogWrite(L_BmotorPin, back);
+  Serial.println("Left Motor Forward");
+  Serial.println();
+}
+void Reverse()
+{
+  int speedR = 0;
+  int speedL = 0;
+  int back = 200;
+  analogWrite(R_FmotorPin, speedR);
+  analogWrite(R_BmotorPin, back);
+  Serial.print("Right Motor Reverse");
+  Serial.println();
+  analogWrite(L_FmotorPin, speedL);
+  analogWrite(L_BmotorPin, back);
+  Serial.println("Left Motor Reverse");
+  Serial.println();
+}
+
+void Stop()
+{  int speedR = 0;
+  int speedL = 0;
+  int back = 0;
+  analogWrite(R_FmotorPin, speedR);
+  analogWrite(R_BmotorPin, back);
+  Serial.print("Right Motor Stop");
+  Serial.println();
+  analogWrite(L_FmotorPin, speedL);
+  analogWrite(L_BmotorPin, back);
+  Serial.println("Left Motor Stop");
+  Serial.println();
+}
+void Left()
+{
+  int speedR = 100;
+  int speedL = 200;
+  int back = 0;
+  analogWrite(R_FmotorPin, speedR);
+  analogWrite(R_BmotorPin, back);
+  Serial.print("Right Motor Slow");
+  Serial.println();
+  analogWrite(L_FmotorPin, speedL);
+  analogWrite(L_BmotorPin, back);
+  Serial.println("Left Motor Fast");
+  Serial.println();
+}
+void Right()
+{
+  int speedR = 200;
+  int speedL = 100;
+  int back = 0;
+  analogWrite(R_FmotorPin, speedR);
+  analogWrite(R_BmotorPin, back);
+  Serial.print("Right Motor Fast");
+  Serial.println();
+  analogWrite(L_FmotorPin, speedL);
+  analogWrite(L_BmotorPin, back);
+  Serial.println("Left Motor Slow");
+  Serial.println();
+}
